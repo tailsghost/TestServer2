@@ -1,10 +1,20 @@
 using Kurskcartuning.Server_v2.Core.DbContext;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
-builder.Services.AddControllers();
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(option =>
+    {
+        option.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 
 // DB
@@ -14,6 +24,54 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     var connectionString = builder.Configuration.GetConnectionString("local");
     options.UseSqlServer(connectionString);
 });
+
+// Dependency Injection
+
+
+
+// Add Identity
+builder.Services
+    .AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
+// Config Identity
+builder.Services.Configure<IdentityOptions>(option =>
+{
+    option.Password.RequiredLength = 8;
+    option.Password.RequireDigit = false;
+    option.Password.RequireLowercase = false;
+    option.Password.RequireUppercase = false;
+    option.Password.RequireNonAlphanumeric = false;
+    option.SignIn.RequireConfirmedAccount = false;
+    option.SignIn.RequireConfirmedEmail = false;
+    option.SignIn.RequireConfirmedPhoneNumber = false;
+});
+
+
+
+
+// Add AuthenticationSchema and JwtBearer
+builder.Services
+    .AddAuthentication(option =>
+    {
+        option.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(option =>
+    {
+        option.SaveToken = true;
+        option.RequireHttpsMetadata = false;
+        option.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
+            ValidAudience = builder.Configuration["JWT:ValidAudience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
+        };
+    });
 
 
 
@@ -38,6 +96,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
