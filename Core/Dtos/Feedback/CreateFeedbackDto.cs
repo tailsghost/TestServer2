@@ -4,6 +4,8 @@ public class CreateFeedbackDto
 {
     public string UserName { get; set; }
 
+    public string ClientName { get; set; }
+
     public string Text { get; set; }
 }
 

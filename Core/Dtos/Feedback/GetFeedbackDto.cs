@@ -6,6 +6,8 @@ public class GetFeedbackDto
 
     public string UserName { get; set; }
 
+    public string ClientName { get; set; }
+
     public string VehicleName { get; set; }
 
     public string VisitString { get; set; }

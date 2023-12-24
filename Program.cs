@@ -1,4 +1,6 @@
 using Kurskcartuning.Server_v2.Core.DbContext;
+using Kurskcartuning.Server_v2.Core.Interfaces;
+using Kurskcartuning.Server_v2.Core.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -27,15 +29,19 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // Dependency Injection
 
+builder.Services.AddScoped<ILogService, LogService>();
+
 
 
 // Add Identity
+
 builder.Services
     .AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
 // Config Identity
+
 builder.Services.Configure<IdentityOptions>(option =>
 {
     option.Password.RequiredLength = 8;
