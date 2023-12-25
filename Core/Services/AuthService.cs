@@ -6,7 +6,11 @@ using Kurskcartuning.Server_v2.Core.Entities.UserStoreCustom;
 using Kurskcartuning.Server_v2.Core.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 
 namespace Kurskcartuning.Server_v2.Core.Services;
 
@@ -27,7 +31,6 @@ public class AuthService : IAuthService
         _configuration = configuration;
         _userStoreCustom = userStoreCustom;
     }
-
 
     public async Task<GeneralServiceResponceDto> SeedRolesAsync()
     {
@@ -125,40 +128,218 @@ public class AuthService : IAuthService
     public async Task<LoginServiceResponceDto?> LoginAsync(LoginDto loginDto)
     {
         var user = await _userManager.FindByNameAsync(loginDto.UserName);
-        if(user is null)
+        if (user is null)
             return null;
 
         var isPasswordCorrect = await _userManager.CheckPasswordAsync(user, loginDto.Password);
         if (!isPasswordCorrect)
             return null;
 
-        
-        
+        var newToken = await GenerateJWTTokenAsync(user);
+        var roles = await _userManager.GetRolesAsync(user);
+        var userInfo = GenerateUserInfoObject(user, roles);
+        await _logService.SaveNewLog(user.UserName, "Вошел в систему");
+
+        return new LoginServiceResponceDto()
+        {
+            NewToken = newToken,
+            UserInfo = userInfo
+        };
+
     }
 
-    public Task<UserInfoResult> GetUserDetailsByUserName(string userName)
+    public async Task<GeneralServiceResponceDto> UpdateRoleAsync(ClaimsPrincipal User, UpdateRoleDto updateRoleDto)
     {
-        throw new NotImplementedException();
+        var user = await _userManager.FindByNameAsync(updateRoleDto.UserName);
+        if (user is null)
+            return new GeneralServiceResponceDto()
+            {
+                IsSucced = false,
+                StatusCode = 404,
+                Message = "Неверное имя пользователя"
+            };
+
+        var userRoles = await _userManager.GetRolesAsync(user);
+
+        if (User.IsInRole(StaticUserRoles.Admin))
+        {
+            if (updateRoleDto.NewRole.Equals(RoleType.User) || updateRoleDto.NewRole.Equals(RoleType.UserPremium))
+            {
+                if (userRoles.Any(q => q.Equals(StaticUserRoles.Owner) || q.Equals(StaticUserRoles.Admin)))
+                {
+                    return new GeneralServiceResponceDto()
+                    {
+                        IsSucced = false,
+                        StatusCode = 403,
+                        Message = "Нет доступа к изменению роли пользователя",
+                    };
+                }
+                else
+                {
+                    await _userManager.RemoveFromRolesAsync(user, userRoles);
+                    await _userManager.AddToRoleAsync(user, updateRoleDto.NewRole.ToString());
+                    await _logService.SaveNewLog(user.UserName, "Роли пользователя обновлены");
+                    return new GeneralServiceResponceDto()
+                    {
+                        IsSucced = true,
+                        StatusCode = 200,
+                        Message = "Роли успешно обновлены",
+                    };
+                }
+            }
+            else return new GeneralServiceResponceDto()
+            {
+                IsSucced = false,
+                StatusCode = 403,
+                Message = "Нет доступа к изменению роли пользователя"
+            };
+
+        }
+        else
+        {
+            if (userRoles.Any(q => q.Equals(StaticUserRoles.Owner)))
+            {
+                return new GeneralServiceResponceDto()
+                {
+                    IsSucced = false,
+                    StatusCode = 403,
+                    Message = "Нет доступа к изменению роли пользователя"
+                };
+            }
+
+            else
+            {
+                await _userManager.RemoveFromRolesAsync(user, userRoles);
+                await _userManager.AddToRoleAsync(user, updateRoleDto.NewRole.ToString());
+                await _logService.SaveNewLog(user.UserName, "Роли пользователя обновлены");
+
+
+                return new GeneralServiceResponceDto()
+                {
+                    IsSucced = true,
+                    StatusCode = 200,
+                    Message = "Роли успешно обновлены"
+                };
+            }
+            
+        }
     }
 
-    public Task<IEnumerable<string>> GetUsernamesListAsync()
+    public async Task<LoginServiceResponceDto?> MeAsync(MeDto meDto)
     {
-        throw new NotImplementedException();
+        ClaimsPrincipal handler = new JwtSecurityTokenHandler().ValidateToken(meDto.Token, new TokenValidationParameters()
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidIssuer = _configuration["JWT:ValidIssuer"],
+            ValidAudience = _configuration["JWT:ValidAudience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]))
+        }, out SecurityToken securityToken);
+
+        string decodedUserName = handler.Claims.First(q => q.Type == ClaimTypes.Name).Value;
+        if(decodedUserName is null)
+            return null;
+
+        var user = await _userManager.FindByNameAsync(decodedUserName);
+        if (user is null)
+            return null;
+
+        var newToken = await GenerateJWTTokenAsync(user);
+        var roles = await _userManager.GetRolesAsync(user);
+        var userInfo = GenerateUserInfoObject(user, roles);
+        await _logService.SaveNewLog(user.UserName, "Сгенерирован новый Токен");
+
+        return new LoginServiceResponceDto()
+        {
+            NewToken = newToken,
+            UserInfo = userInfo,
+        };
+
     }
 
-    public Task<IEnumerable<UserInfoResult>> GetUsersListAsync()
+    public async Task<IEnumerable<UserInfoResult>> GetUsersListAsync()
     {
-        throw new NotImplementedException();
+        var users = await _userManager.Users.ToListAsync();
+
+        List<UserInfoResult> userInfoResults = new List<UserInfoResult>();
+
+        foreach(var user in users)
+        {
+            var roles = await _userManager.GetRolesAsync(user);
+            var userInfo = GenerateUserInfoObject(user, roles);
+            userInfoResults.Add(userInfo);
+        }
+
+        return userInfoResults;
     }
 
-    public Task<LoginServiceResponceDto> MeAsync(MeDto meDto)
+    public async Task<UserInfoResult?> GetUserDetailsByUserNameAsync(string userName)
     {
-        throw new NotImplementedException();
+        var user = await _userManager.FindByNameAsync(userName);
+        if(user is null)
+            return null;
+
+        var roles = await _userManager.GetRolesAsync(user);
+        var userInfo = GenerateUserInfoObject(user, roles);
+
+        return userInfo;
     }
 
-    public Task<GeneralServiceResponceDto> UpdateRoleAsync(ClaimsPrincipal User, UpdateRoleDto updateRoleDto)
+    public async Task<IEnumerable<string>> GetUsernamesListAsync()
     {
-        throw new NotImplementedException();
+        var userNames = await _userManager.Users.Select(q => q.UserName).ToListAsync();
+
+        return userNames;
+    }
+
+
+    private async Task<string> GenerateJWTTokenAsync(ApplicationUser user)
+    {
+        var userRoles = await _userManager.GetRolesAsync(user);
+
+        var authClaims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Name, user.UserName),
+            new Claim(ClaimTypes.NameIdentifier, user.Id),
+            new Claim("FirstName", user.FirstName),
+            new Claim("LastName", user.LastName),
+        };
+
+        foreach (var userRole in userRoles)
+        {
+            authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+        }
+
+        var authSecret = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
+        var signinCredentials = new SigningCredentials(authSecret, SecurityAlgorithms.HmacSha256);
+
+        var tokenObject = new JwtSecurityToken(
+            issuer: _configuration["JWT:ValidIssuer"],
+            audience: _configuration["JWT:ValidAudience"],
+            notBefore: DateTime.Now,
+            expires: DateTime.Now.AddHours(5),
+            claims: authClaims,
+            signingCredentials: signinCredentials
+            );
+
+
+        string token = new JwtSecurityTokenHandler().WriteToken(tokenObject);
+        return token;
+    }
+
+    private UserInfoResult GenerateUserInfoObject(ApplicationUser user, IEnumerable<string> Roles)
+    {
+        return new UserInfoResult()
+        {
+            Id = user.Id,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            UserName = user.UserName,
+            Email = user.Email,
+            Roles = Roles,
+            CreatedAt = user.CreatedAt,
+            Phone = user.Phone,
+        };
     }
 }
 

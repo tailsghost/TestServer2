@@ -32,6 +32,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddScoped<ILogService, LogService>();
 builder.Services.AddSingleton<UserStoreCustom>();
+builder.Services.AddScoped<IFeedbackService, FeedbackService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+
 
 
 

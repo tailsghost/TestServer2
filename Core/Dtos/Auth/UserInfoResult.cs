@@ -12,6 +12,8 @@ public class UserInfoResult
 
     public string Email { get; set; }
 
+    public string Phone { get; set; }
+
     public DateTime CreatedAt {  get; set; }
 
     public IEnumerable<string> Roles { get; set; }

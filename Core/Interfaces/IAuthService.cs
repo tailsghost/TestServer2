@@ -14,11 +14,11 @@ public interface IAuthService
 
     Task<GeneralServiceResponceDto> UpdateRoleAsync(ClaimsPrincipal User, UpdateRoleDto updateRoleDto);
 
-    Task<LoginServiceResponceDto> MeAsync(MeDto meDto);
+    Task<LoginServiceResponceDto?> MeAsync(MeDto meDto);
 
     Task<IEnumerable<UserInfoResult>> GetUsersListAsync();
 
-    Task<UserInfoResult> GetUserDetailsByUserName(string userName);
+    Task<UserInfoResult?> GetUserDetailsByUserNameAsync(string userName);
 
     Task<IEnumerable<string>> GetUsernamesListAsync();
 }
