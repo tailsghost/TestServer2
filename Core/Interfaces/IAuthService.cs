@@ -10,7 +10,7 @@ public interface IAuthService
 
     Task<GeneralServiceResponceDto> RegisterAsync(RegisterDto registerDto);
 
-    Task<LoginServiceResponceDto> LoginAsync(LoginDto loginDto);
+    Task<LoginServiceResponceDto?> LoginAsync(LoginDto loginDto);
 
     Task<GeneralServiceResponceDto> UpdateRoleAsync(ClaimsPrincipal User, UpdateRoleDto updateRoleDto);
 

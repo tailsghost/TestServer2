@@ -1,4 +1,5 @@
 using Kurskcartuning.Server_v2.Core.DbContext;
+using Kurskcartuning.Server_v2.Core.Entities.UserStoreCustom;
 using Kurskcartuning.Server_v2.Core.Interfaces;
 using Kurskcartuning.Server_v2.Core.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -30,6 +31,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Dependency Injection
 
 builder.Services.AddScoped<ILogService, LogService>();
+builder.Services.AddSingleton<UserStoreCustom>();
 
 
 
@@ -38,6 +40,7 @@ builder.Services.AddScoped<ILogService, LogService>();
 builder.Services
     .AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddUserStore<UserStoreCustom>()
     .AddDefaultTokenProviders();
 
 // Config Identity
@@ -51,7 +54,7 @@ builder.Services.Configure<IdentityOptions>(option =>
     option.Password.RequireNonAlphanumeric = false;
     option.SignIn.RequireConfirmedAccount = false;
     option.SignIn.RequireConfirmedEmail = false;
-    option.SignIn.RequireConfirmedPhoneNumber = false;
+    option.SignIn.RequireConfirmedPhoneNumber = true;
 });
 
 

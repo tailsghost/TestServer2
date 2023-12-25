@@ -11,6 +11,9 @@ public class RegisterDto
     [Required(ErrorMessage = "Введите имя пользователя")]
     public string UserName { get; set; }
 
+    [Required(ErrorMessage = "Введите номер телефона")]
+    public string Phone {  get; set; }
+
     public string Email { get; set; }
 
     [Required(ErrorMessage = "Введите пароль")]
