@@ -1,6 +1,6 @@
 ﻿using Kurskcartuning.Server_v2.Core.DbContext;
 using Kurskcartuning.Server_v2.Core.Dtos.Log;
-using Kurskcartuning.Server_v2.Core.Entities;
+using Kurskcartuning.Server_v2.Core.Entities.Application;
 using Kurskcartuning.Server_v2.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;

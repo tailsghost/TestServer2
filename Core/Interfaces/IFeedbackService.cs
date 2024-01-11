@@ -10,6 +10,6 @@ public interface IFeedbackService
 
     Task<IEnumerable<GetFeedbackDto>> GetFeedbackAsync();
 
-    Task<IEnumerable<GetFeedbackDto>> GetMyMessagesAsync(ClaimsPrincipal User);
+    Task<IEnumerable<GetFeedbackDto>> GetMyFeedbackAsync(ClaimsPrincipal User);
 }
 

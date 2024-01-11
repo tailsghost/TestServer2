@@ -1,10 +1,11 @@
-﻿using Kurskcartuning.Server_v2.Core.Constants;
+﻿using Kurskcartuning.Server_v2.Config;
+using Kurskcartuning.Server_v2.Core.Constants;
 using Kurskcartuning.Server_v2.Core.Dtos.Auth;
 using Kurskcartuning.Server_v2.Core.Dtos.General;
-using Kurskcartuning.Server_v2.Core.Entities;
+using Kurskcartuning.Server_v2.Core.Entities.Application;
 using Kurskcartuning.Server_v2.Core.Entities.UserStoreCustom;
+using Kurskcartuning.Server_v2.Core.Enum;
 using Kurskcartuning.Server_v2.Core.Interfaces;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -63,7 +64,7 @@ public class AuthService : IAuthService
     public async Task<GeneralServiceResponceDto> RegisterAsync(RegisterDto registerDto)
     {
         var isExistsUser = await _userManager.FindByNameAsync(registerDto.UserName);
-        var isExistsUserPhone = await _userStoreCustom.FindByPhoneNumberAsync(registerDto.Phone);
+        var isExistsUserPhone = await _userStoreCustom.FindByPhoneNumberAsync(registerDto.PhoneNumber);
 
         if (isExistsUser is not null)
             return new GeneralServiceResponceDto()
@@ -89,7 +90,7 @@ public class AuthService : IAuthService
             Email = registerDto.Email,
             UserName = registerDto.UserName,
             Address = registerDto.Address,
-            Phone = registerDto.Phone,
+            PhoneNumber = registerDto.PhoneNumber,
             SecurityStamp = Guid.NewGuid().ToString(),
         };
 
@@ -300,7 +301,7 @@ public class AuthService : IAuthService
         var authClaims = new List<Claim>
         {
             new Claim(ClaimTypes.Name, user.UserName),
-            new Claim(ClaimTypes.NameIdentifier, user.Id),
+            new Claim(CustomClaimTypes.Id, user.Id),
             new Claim("FirstName", user.FirstName),
             new Claim("LastName", user.LastName),
         };
@@ -338,7 +339,7 @@ public class AuthService : IAuthService
             Email = user.Email,
             Roles = Roles,
             CreatedAt = user.CreatedAt,
-            Phone = user.Phone,
+            PhoneNumber = user.PhoneNumber,
         };
     }
 }

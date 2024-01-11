@@ -12,7 +12,7 @@ public class RegisterDto
     public string UserName { get; set; }
 
     [Required(ErrorMessage = "Введите номер телефона")]
-    public string Phone {  get; set; }
+    public string PhoneNumber {  get; set; }
 
     public string Email { get; set; }
 

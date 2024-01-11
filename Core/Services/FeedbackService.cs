@@ -1,7 +1,8 @@
 ﻿using Kurskcartuning.Server_v2.Core.DbContext;
 using Kurskcartuning.Server_v2.Core.Dtos.Feedback;
 using Kurskcartuning.Server_v2.Core.Dtos.General;
-using Kurskcartuning.Server_v2.Core.Entities;
+using Kurskcartuning.Server_v2.Core.Entities.Application;
+using Kurskcartuning.Server_v2.Core.Entities.Application;
 using Kurskcartuning.Server_v2.Core.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -79,7 +80,7 @@ public class FeedbackService : IFeedbackService
         return feedback;
     }
 
-    public async Task<IEnumerable<GetFeedbackDto>> GetMyMessagesAsync(ClaimsPrincipal User)
+    public async Task<IEnumerable<GetFeedbackDto>> GetMyFeedbackAsync(ClaimsPrincipal User)
     {
         var loggedInUser = User.Identity.Name;
         var feedback = await _context.Feedbacks

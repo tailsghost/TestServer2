@@ -1,6 +1,6 @@
-﻿namespace Kurskcartuning.Server_v2.Core.Entities;
+﻿namespace Kurskcartuning.Server_v2.Core.Entities.Application;
 
-public class Feedback: BaseEntity<long>
+public class Feedback : BaseEntity<long>
 {
     public string UserName { get; set; }
 

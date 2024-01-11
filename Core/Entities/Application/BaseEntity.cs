@@ -1,6 +1,6 @@
-﻿namespace Kurskcartuning.Server_v2.Core.Entities;
+﻿namespace Kurskcartuning.Server_v2.Core.Entities.Application;
 
-public  class BaseEntity<TID>
+public class BaseEntity<TID>
 {
     public TID Id { get; set; }
 
