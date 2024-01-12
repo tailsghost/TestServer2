@@ -31,11 +31,7 @@ namespace Kurskcartuning.Server_v2.Controllers
 
             _context.SaveChanges();
 
-            Thread.Sleep(2000);
-
-            var client1 = await _context.Clients.Where(x => x.Id.Equals(clientId)).FirstOrDefaultAsync();
-
-            return Ok(client1);
+            return Ok(vehicle);
 
         }
     }

@@ -43,7 +43,7 @@ namespace Kurskcartuning.Server_v2.Controllers
         }
 
         [HttpPost("update-role")]
-        //[Authorize(Roles = StaticUserRoles.OwnerAdmin)]
+        [Authorize(Roles = StaticUserRoles.OwnerAdmin)]
         public async Task<IActionResult> UpdateRole([FromBody] UpdateRoleDto dto)
         {
             var updateRolesResult = await _authService.UpdateRoleAsync(User, dto);

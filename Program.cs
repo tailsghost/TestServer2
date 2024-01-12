@@ -2,7 +2,9 @@ using Kurskcartuning.Server_v2.Core.DbContext;
 using Kurskcartuning.Server_v2.Core.Entities.Application;
 using Kurskcartuning.Server_v2.Core.Entities.UserStoreCustom;
 using Kurskcartuning.Server_v2.Core.Interfaces;
+using Kurskcartuning.Server_v2.Core.Interfaces.App;
 using Kurskcartuning.Server_v2.Core.Services;
+using Kurskcartuning.Server_v2.Core.Services.App;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -70,6 +72,7 @@ builder.Services.AddScoped<ILogService, LogService>();
 builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<UserStoreCustom>();
+builder.Services.AddScoped<IClientService, ClientService>();
 
 
 // Add Identity

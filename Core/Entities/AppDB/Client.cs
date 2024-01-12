@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Kurskcartuning.Server_v2.Core.Entities.AppDB;
+﻿namespace Kurskcartuning.Server_v2.Core.Entities.AppDB;
 
 public class Client: BaseEntity<long>
 {
