@@ -1,4 +1,5 @@
 ﻿using Kurskcartuning.Server_v2.Core.DbContext;
+using Kurskcartuning.Server_v2.Core.Dtos.App;
 using Kurskcartuning.Server_v2.Core.Dtos.App.Client;
 using Kurskcartuning.Server_v2.Core.Entities.AppDB;
 using Kurskcartuning.Server_v2.Core.Interfaces;
@@ -20,12 +21,12 @@ public class ClientService : IClientService
         _logService = logService;
     }
 
-    public async Task<ClientServiceResponceDto> DeleteClientAsync(ClaimsPrincipal User, ClientDeleteDto dto)
+    public async Task<GeneralAppServiceResponceDto> DeleteClientAsync(ClaimsPrincipal User, ClientDeleteDto dto)
     {
         Client? client = await _context.Clients.FirstOrDefaultAsync(x => x.Id.Equals(dto.Id));
 
         if (client is null)
-            return new ClientServiceResponceDto()
+            return new GeneralAppServiceResponceDto()
             {
                 IsSucced = false,
                 StatusCode = 404,
@@ -38,7 +39,7 @@ public class ClientService : IClientService
 
         await _logService.SaveNewLog(User.Identity.Name, $"Клиент {dto.Name} ({dto.Phone}) успешно удален!");
 
-        return new ClientServiceResponceDto()
+        return new GeneralAppServiceResponceDto()
         {
             IsSucced = true,
             StatusCode = 200,
@@ -46,48 +47,48 @@ public class ClientService : IClientService
         };
     }
 
-    public async Task<ClientServiceResponceDto> GetClientIdAsync(long id)
+    public async Task<GeneralAppServiceResponceDto> GetClientIdAsync(long id)
     {
         var client = await _context.Clients.Where(x => x.Id.Equals(id)).Select(x => new ClientResponceDto() { FirstName = x.FirstName, Id = x.Id, Phone = x.Phone }).OrderBy(q => q.Id).FirstOrDefaultAsync();
         if (client is null)
-            return new ClientServiceResponceDto()
+            return new GeneralAppServiceResponceDto()
             {
                 IsSucced = false,
                 StatusCode = 404,
                 Message = "Ошибка получения клиента"
             };
 
-        return new ClientServiceResponceDto()
+        return new GeneralAppServiceResponceDto()
         {
             IsSucced = true,
             Message = "Клиент получен",
             StatusCode = 200,
-            Client = client
+            Responce = client
         };
     }
 
-    public async Task<ClientServiceResponceDto> GetClientsAsync(string id)
+    public async Task<GeneralAppServiceResponceDto> GetClientsAsync(string id)
     {
         var clients = await _context.Clients.Where(x => x.UserId.Equals(id)).Select(x => new ClientResponceDto() { FirstName = x.FirstName, Id = x.Id, Phone = x.Phone }).OrderBy(q => q.FirstName).ToListAsync();
 
         if (clients.Count == 0)
-            return new ClientServiceResponceDto()
+            return new GeneralAppServiceResponceDto()
             {
                 IsSucced = false,
                 Message = "У Вас еще нет клиентов",
                 StatusCode = 404,
             };
 
-        return new ClientServiceResponceDto()
+        return new GeneralAppServiceResponceDto()
         {
             IsSucced = true,
             Message = "Клиенты получены",
             StatusCode = 200,
-            Client = clients
+            Responce = clients
         };
     }
 
-    public async Task<ClientServiceResponceDto> PostClientAsync(ClaimsPrincipal User, ClientPostDto dto, string id)
+    public async Task<GeneralAppServiceResponceDto> PostClientAsync(ClaimsPrincipal User, ClientPostDto dto, string id)
     {
 
         var isUserPhoneValid = await _context.Clients.Where(x => x.Phone.Equals(dto.Phone))
@@ -95,7 +96,7 @@ public class ClientService : IClientService
             .FirstOrDefaultAsync();
 
         if (isUserPhoneValid is not null)
-            return new ClientServiceResponceDto()
+            return new GeneralAppServiceResponceDto()
             {
                 IsSucced = false,
                 Message = "Такой клиент уже существует!",
@@ -114,23 +115,23 @@ public class ClientService : IClientService
             .FirstOrDefaultAsync();
 
         if (client is null)
-            return new ClientServiceResponceDto()
+            return new GeneralAppServiceResponceDto()
             {
                 IsSucced = false,
                 Message = "Ошибка получения клиента, обновите приложение",
                 StatusCode = 404,
             };
 
-        return new ClientServiceResponceDto()
+        return new GeneralAppServiceResponceDto()
         {
             IsSucced = true,
             Message = "Клиент успешно добавлен!",
             StatusCode = 201,
-            Client = client
+            Responce = client
         };
     }
 
-    public async Task<ClientServiceResponceDto> PutClientAsync(ClaimsPrincipal User, ClientPutDto dto)
+    public async Task<GeneralAppServiceResponceDto> PutClientAsync(ClaimsPrincipal User, ClientPutDto dto)
     {
         var client = await _context.Clients
             .Where(x => x.Id.Equals(dto.Id))
@@ -139,7 +140,7 @@ public class ClientService : IClientService
 
 
         if (client == null)
-            return new ClientServiceResponceDto()
+            return new GeneralAppServiceResponceDto()
             {
                 IsSucced = false,
                 Message = "Ошибка получения клиента",
@@ -155,12 +156,12 @@ public class ClientService : IClientService
         await _logService.SaveNewLog(User.Identity.Name, $"Клиент {dto.Name} ({dto.Phone}) успешно обновлен!");
 
 
-        return new ClientServiceResponceDto()
+        return new GeneralAppServiceResponceDto()
         {
             IsSucced = true,
             Message = "Клиент успешно обнавлен!",
             StatusCode = 202,
-            Client = client
+            Responce = client
         };
     }
 }

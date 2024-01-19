@@ -6,10 +6,8 @@ public class Manufacturer: BaseEntity<long>
 {
     public string Value { get; set; }
 
-    public long VehicleId { get; set; }
+    public List<Vehicle> Vehicles { get; set; } = new();
 
-    public Vehicle Vehicle { get; set; }
-
-    public List<Model> Models { get; set; }
+    public List<Model> Models { get; set; } = new();
 }
 

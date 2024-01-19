@@ -94,7 +94,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
             e.HasKey(e => e.Id);
             e.HasMany(e => e.Visits).WithOne(e => e.Vehicle).HasForeignKey(e => e.VehicleId);
-            e.HasMany(e => e.Manufacturer).WithOne(e => e.Vehicle).HasForeignKey(e => e.VehicleId);
         });
 
         builder.Entity<Visit>(e =>
@@ -114,6 +113,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
             e.HasKey(e => e.Id);
             e.HasMany(e => e.Models).WithOne(e => e.Manufacturer).HasForeignKey(e => e.ManufacturerId);
+            e.HasMany(e => e.Vehicles).WithOne(e => e.Manufacturer).HasForeignKey(e => e.ManufacturerId);
         });
 
         builder.Entity<Model>(e =>

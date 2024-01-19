@@ -1,5 +1,6 @@
 ﻿using Kurskcartuning.Server_v2.Config;
 using Kurskcartuning.Server_v2.Core.Constants;
+using Kurskcartuning.Server_v2.Core.Dtos.App;
 using Kurskcartuning.Server_v2.Core.Dtos.App.Client;
 using Kurskcartuning.Server_v2.Core.Entities.AppDB;
 using Kurskcartuning.Server_v2.Core.Interfaces.App;
@@ -23,7 +24,7 @@ namespace Kurskcartuning.Server_v2.Controllers
 
         [HttpPost("new-client")]
         [Authorize(Roles = StaticUserRoles.OwnerAdminUserPremium)]
-        public async Task<ActionResult<ClientServiceResponceDto>> PostClient([FromForm] ClientPostDto dto)
+        public async Task<ActionResult<GeneralAppServiceResponceDto>> PostClient([FromForm] ClientPostDto dto)
         {
             var newClient = await _clientService.PostClientAsync(User, dto, UserId);
 
@@ -36,7 +37,7 @@ namespace Kurskcartuning.Server_v2.Controllers
 
         [HttpGet("get-client/{id}")]
         [Authorize(Roles = StaticUserRoles.OwnerAdminUserPremium)]
-        public async Task<ActionResult<ClientServiceResponceDto>> GetClientAsync(long id)
+        public async Task<ActionResult<GeneralAppServiceResponceDto>> GetClientAsync(long id)
         {
             var client = await _clientService.GetClientIdAsync(id);
 
@@ -48,7 +49,7 @@ namespace Kurskcartuning.Server_v2.Controllers
 
         [HttpGet("get-clients")]
         [Authorize(Roles = StaticUserRoles.OwnerAdminUserPremium)]
-        public async Task<ActionResult<ClientServiceResponceDto>> GetClients()
+        public async Task<ActionResult<GeneralAppServiceResponceDto>> GetClients()
         {
             var clients = await _clientService.GetClientsAsync(UserId);
 
@@ -60,7 +61,7 @@ namespace Kurskcartuning.Server_v2.Controllers
 
         [HttpPut("put-client")]
         [Authorize(Roles = StaticUserRoles.OwnerAdminUserPremium)]
-        public async Task<ActionResult<ClientServiceResponceDto>> PutClient(ClientPutDto dto)
+        public async Task<ActionResult<GeneralAppServiceResponceDto>> PutClient(ClientPutDto dto)
         {
             var client = await _clientService.PutClientAsync(User, dto);
 
@@ -73,7 +74,7 @@ namespace Kurskcartuning.Server_v2.Controllers
 
         [HttpDelete("delete-client")]
         [Authorize(Roles = StaticUserRoles.OwnerAdminUserPremium)]
-        public async Task<ActionResult<ClientServiceResponceDto>> DeleteClient(ClientDeleteDto dto)
+        public async Task<ActionResult<GeneralAppServiceResponceDto>> DeleteClient(ClientDeleteDto dto)
         {
             var client = await _clientService.DeleteClientAsync(User, dto);
 

@@ -10,6 +10,6 @@ public class ClientResponceDto
 
     public string Phone {  get; set; }
 
-    public List<Vehicle>? Vehicles { get; set; } = new();
+    public List<Entities.AppDB.Vehicle>? Vehicles { get; set; } = new();
 }
 

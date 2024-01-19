@@ -4,9 +4,9 @@ namespace Kurskcartuning.Server_v2.Core.Entities.AppDB;
 
 public class Vehicle: BaseEntity<long>
 {
-    public long ClientId { get; set; }
+    public long? ClientId { get; set; }
 
-    public long ManufacturerId { get; set; }
+    public long? ManufacturerId { get; set; }
 
     public string RegistrationNumber { get; set; }
 
@@ -19,6 +19,7 @@ public class Vehicle: BaseEntity<long>
     public Client Client { get; set; }
 
     public List<Visit>? Visits { get; set; }
-    public List<Manufacturer>? Manufacturer { get; set; }
+
+    public Manufacturer Manufacturer { get; set; }
 }
 

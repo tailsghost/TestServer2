@@ -1,7 +1,10 @@
-﻿using Kurskcartuning.Server_v2.Core.DbContext;
-using Kurskcartuning.Server_v2.Core.Dtos.Auth;
+﻿using Kurskcartuning.Server_v2.Config;
+using Kurskcartuning.Server_v2.Core.Constants;
+using Kurskcartuning.Server_v2.Core.Dtos.App;
+using Kurskcartuning.Server_v2.Core.Dtos.App.Vehicle;
 using Kurskcartuning.Server_v2.Core.Entities.AppDB;
-using Microsoft.AspNetCore.Http;
+using Kurskcartuning.Server_v2.Core.Interfaces.App;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,28 +14,63 @@ namespace Kurskcartuning.Server_v2.Controllers
     [ApiController]
     public class VehicleController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IVehicleService _vehicleService;
 
-        public VehicleController(ApplicationDbContext context)
+        public VehicleController(IVehicleService service)
         {
-            _context = context;
+            _vehicleService = service;
         }
 
-        [HttpPost("new-client")]
-        public async Task<ActionResult<LoginServiceResponceDto>> NewClient(string configuration, long enginePower, string registrationNumber, long year, long clientId)
+        [HttpPost("new-vehicle")]
+        [Authorize(Roles = StaticUserRoles.OwnerAdminUserPremium)]
+        public async Task<ActionResult<GeneralAppServiceResponceDto>> NewVehicle(VehiclePostDto dto)
         {
-            Vehicle vehicle = new Vehicle {Configuration = configuration, EnginePower = enginePower, RegistrationNumber = registrationNumber, Year = year };
+            var newVehicle = await _vehicleService.PostVehicleAsync(User, dto, UserId);
+            if (newVehicle.IsSucced is false )
+                return StatusCode(newVehicle.StatusCode, newVehicle.Message);
 
-            var client =  await _context.Clients.Where(x => x.Id.Equals(clientId)).FirstOrDefaultAsync();
-
-          var lol =  client.Vehicles = new List<Vehicle>();
-
-            lol.Add(vehicle);
-
-            _context.SaveChanges();
-
-            return Ok(vehicle);
-
+            return Ok(newVehicle);
         }
+
+
+        [HttpGet("get-vehicle-id/{id}")]
+        [Authorize(Roles = StaticUserRoles.OwnerAdminUserPremium)]
+        public async Task<IActionResult> GetVehicleId(long id)
+        {
+           var newVehicleId = await _vehicleService.GetVehicleIdAsync(id, UserId);
+            
+            if (newVehicleId.IsSucced is false ) 
+                return StatusCode(newVehicleId.StatusCode, newVehicleId.Message);
+
+            return Ok(newVehicleId);
+        }
+
+        [HttpPut("put-vehicle-id/{id}")]
+        [Authorize(Roles = StaticUserRoles.OwnerAdminUserPremium)]
+        public async Task<IActionResult> PutVehicleId(long id, VehiclePutDto dto)
+        {
+            var newVehicle = await _vehicleService.PutVehicleAsync(id, UserId, dto);
+
+            if (newVehicle.IsSucced is false)
+                return StatusCode(newVehicle.StatusCode, newVehicle.Message);
+
+            return Ok(newVehicle);
+        }
+
+
+        [HttpGet("get-vehicles")]
+        [Authorize(Roles = StaticUserRoles.OwnerAdminUserPremium)]
+        public async Task<IActionResult> GetVehicles(long id)
+        {
+            var vehicles = await _vehicleService.GetVehicleListAsync(id, UserId);
+
+            if (vehicles.IsSucced is false)
+                return StatusCode(vehicles.StatusCode, vehicles.Message);
+
+            return Ok(vehicles);
+        }
+
+
+        private string UserId => HttpContext.User.Claims.First(x => x.Type == CustomClaimTypes.Id).Value;
     }
 }

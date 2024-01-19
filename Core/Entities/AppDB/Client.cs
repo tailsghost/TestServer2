@@ -8,6 +8,6 @@ public class Client: BaseEntity<long>
 
     public string UserId { get; set; }
 
-    public List<Vehicle>? Vehicles { get; set; }
+    public List<Vehicle> Vehicles { get; set; } = new();
 }
 

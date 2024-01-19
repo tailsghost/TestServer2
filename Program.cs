@@ -73,6 +73,7 @@ builder.Services.AddScoped<IFeedbackService, FeedbackService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<UserStoreCustom>();
 builder.Services.AddScoped<IClientService, ClientService>();
+builder.Services.AddScoped<IVehicleService, VehicleService>();
 
 
 // Add Identity
