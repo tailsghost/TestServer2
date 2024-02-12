@@ -4,6 +4,7 @@ using Kurskcartuning.Server_v2.Core.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Kurskcartuning.Server_v2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240125161111_updateVisit")]
+    partial class updateVisit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -194,9 +197,6 @@ namespace Kurskcartuning.Server_v2.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("Price")
-                        .HasColumnType("bigint");
-
                     b.Property<DateTime>("UpdateAt")
                         .HasColumnType("datetime2");
 
@@ -212,6 +212,33 @@ namespace Kurskcartuning.Server_v2.Migrations
                     b.HasIndex("VisitId");
 
                     b.ToTable("ListOfWorks", (string)null);
+                });
+
+            modelBuilder.Entity("Kurskcartuning.Server_v2.Core.Entities.AppDB.VisitInside.ListOfWorksPrices", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("ListOfWorksId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("Price")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("UpdateAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ListOfWorksId");
+
+                    b.ToTable("ListOfWorksPrices", (string)null);
                 });
 
             modelBuilder.Entity("Kurskcartuning.Server_v2.Core.Entities.AppDB.VisitInside.Malfunction", b =>
@@ -637,6 +664,17 @@ namespace Kurskcartuning.Server_v2.Migrations
                     b.Navigation("Visit");
                 });
 
+            modelBuilder.Entity("Kurskcartuning.Server_v2.Core.Entities.AppDB.VisitInside.ListOfWorksPrices", b =>
+                {
+                    b.HasOne("Kurskcartuning.Server_v2.Core.Entities.AppDB.VisitInside.ListOfWorks", "ListOfWorks")
+                        .WithMany("Prices")
+                        .HasForeignKey("ListOfWorksId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ListOfWorks");
+                });
+
             modelBuilder.Entity("Kurskcartuning.Server_v2.Core.Entities.AppDB.VisitInside.Malfunction", b =>
                 {
                     b.HasOne("Kurskcartuning.Server_v2.Core.Entities.AppDB.Visit", "Visit")
@@ -747,6 +785,11 @@ namespace Kurskcartuning.Server_v2.Migrations
                     b.Navigation("ScreenShots");
 
                     b.Navigation("Suggestions");
+                });
+
+            modelBuilder.Entity("Kurskcartuning.Server_v2.Core.Entities.AppDB.VisitInside.ListOfWorks", b =>
+                {
+                    b.Navigation("Prices");
                 });
 #pragma warning restore 612, 618
         }

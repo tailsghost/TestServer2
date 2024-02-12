@@ -6,9 +6,9 @@ public class Visit: BaseEntity<long>
 {
     public long VehicleId { get; set; }
 
-    public long ChiptuningFileOld { get; set; }
+    public string? ChiptuningFileOld { get; set; }
 
-    public long ChiptuningFileNew { get; set; }
+    public string? ChiptuningFileNew { get; set; }
 
     public long Mileage { get; set; }
 

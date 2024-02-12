@@ -9,7 +9,8 @@ public class ListOfWorks: BaseEntity<long>
 
     public string Value { get; set; }
 
+    public long Price { get; set; }
+
     public Visit Visit { get; set; }
-    public List<ListOfWorksPrices> Prices { get; set; }
 }
 

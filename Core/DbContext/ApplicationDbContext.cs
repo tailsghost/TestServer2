@@ -30,8 +30,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<ListOfWorks> ListOfWorks { get; set; }
 
-    public DbSet<ListOfWorksPrices> ListOfWorksPrices { get; set; }
-
     public DbSet<Malfunction> Malfunctions { get; set; }
 
     public DbSet<ScreenShot> ScreenShots { get; set; }
@@ -126,14 +124,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         builder.Entity<ListOfWorks>(e =>
         {
             e.ToTable("ListOfWorks");
-
-            e.HasKey(e => e.Id);
-            e.HasMany(e => e.Prices).WithOne(e => e.ListOfWorks).HasForeignKey(e => e.ListOfWorksId);
-        });
-
-        builder.Entity<ListOfWorksPrices>(e =>
-        {
-            e.ToTable("ListOfWorksPrices");
 
             e.HasKey(e => e.Id);
         });

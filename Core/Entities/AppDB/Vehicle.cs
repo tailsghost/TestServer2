@@ -18,7 +18,7 @@ public class Vehicle: BaseEntity<long>
 
     public Client Client { get; set; }
 
-    public List<Visit>? Visits { get; set; }
+    public List<Visit>? Visits { get; set; } = new();
 
     public Manufacturer Manufacturer { get; set; }
 }
